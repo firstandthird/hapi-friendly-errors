@@ -40,6 +40,5 @@ exports.register = function(server, options, next) {
 };
 
 exports.register.attributes = {
-  name: 'friendlyErrors',
   pkg: require('./package.json')
 };
