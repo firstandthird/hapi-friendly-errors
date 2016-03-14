@@ -14,7 +14,7 @@ exports.register = function(server, options, next) {
         return reply.continue();
       }
 
-      if (response.output.statusCode == 500) {
+      if (options.logErrors && response.output.statusCode == 500) {
         server.log(['error'], {
           output: response.output,
           path: request.path,
