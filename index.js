@@ -10,6 +10,11 @@ exports.register = function(server, options, next) {
 
     if (response.isBoom) {
 
+      //if application/json, skip
+      if (request.headers['accept'] && request.headers['accept'].match(/application\/json/)) {
+        return reply.continue();
+      }
+
       if (options.errorBlacklist && path.match(new RegExp(options.errorBlacklist))) {
         return reply.continue();
       }
