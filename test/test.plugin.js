@@ -1,0 +1,116 @@
+'use strict';
+
+const code = require('code');
+const Lab = require('lab');
+const lab = exports.lab = Lab.script();
+const Hapi = require('hapi');
+const Boom = require('boom');
+const Vision = require('vision');
+const friendlyErrors = require('../');
+
+lab.experiment('hapi-friendly-errors', () => {
+  let server;
+  lab.before((done) => {
+    server = new Hapi.Server({
+      debug: {
+        log: ['error']
+      }
+    });
+    server.connection({ port: 3000 });
+    server.register({
+      register: friendlyErrors,
+      options: {
+        logErrors: true,
+        view: 'error'
+      }
+    });
+
+    server.register(Vision, (err) => {
+      if (err) {
+        throw err;
+      }
+
+      server.views({
+        engines: { html: require('handlebars') },
+        path: `${__dirname}/tmpl`,
+        context: {
+          someData: 'VALUE'
+        }
+      });
+
+      server.route({
+        path: '/',
+        method: 'GET',
+        handler(request, reply) {
+          reply('Hello');
+        }
+      });
+
+      server.route({
+        path: '/not-found',
+        method: 'GET',
+        handler(request, reply) {
+          reply(Boom.notFound('not found here'));
+        }
+      });
+
+      server.route({
+        path: '/api-route',
+        method: 'GET',
+        handler(request, reply) {
+          reply(Boom.forbidden('Not Authorized', { user: false }));
+        }
+      });
+
+      server.start((err) => {
+        if (err) {
+          console.log(err);
+        }
+        done();
+      });
+    });
+  });
+
+  lab.test(' returns friendly error page', (allDone) => {
+    server.inject({
+      method: 'GET',
+      url: '/not-found',
+      headers: {
+        accept: 'text/html'
+      }
+    }, (response) => {
+      code.expect(response.statusCode).to.equal(404);
+      code.expect(response.payload).to.startWith('<h1>ERROR not found here</h1>');
+      allDone();
+    });
+  });
+
+  lab.test(' includes global view context in template', (allDone) => {
+    server.inject({
+      method: 'GET',
+      url: '/not-found',
+      headers: {
+        accept: 'text/html'
+      }
+    }, (response) => {
+      code.expect(response.statusCode).to.equal(404);
+      code.expect(response.payload).to.contain('<p>VALUE</p>');
+      allDone();
+    });
+  });
+
+  lab.test(' should pass json for non html requests', (allDone) => {
+    server.inject({
+      method: 'GET',
+      url: '/api-route',
+      headers: {
+        accept: 'application/json'
+      }
+    }, (response) => {
+      code.expect(response.result).to.be.an.object();
+      code.expect(response.result.statusCode).to.equal(403);
+      code.expect(response.result.message).to.equal('Not Authorized');
+      allDone();
+    });
+  });
+});
