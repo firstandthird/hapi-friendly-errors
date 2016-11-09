@@ -1,4 +1,12 @@
 
+0.1.0 / 2016-11-09
+==================
+
+  * Adding context to the options
+  * Readme v1
+  * adding travis
+  * Adding unit tests
+
 0.0.3 / 2016-03-22
 ==================
 
