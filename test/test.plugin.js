@@ -65,9 +65,7 @@ lab.experiment('hapi-friendly-errors', () => {
       });
 
       server.start((err) => {
-        if (err) {
-          console.log(err);
-        }
+        code.expect(err).to.be.undefined();
         done();
       });
     });
@@ -130,6 +128,19 @@ lab.experiment('hapi-friendly-errors', () => {
       code.expect(response.result).to.be.an.object();
       code.expect(response.result.statusCode).to.equal(403);
       code.expect(response.result.message).to.equal('Not Authorized');
+      allDone();
+    });
+  });
+
+  lab.test(' should pass on non boom responses', (allDone) => {
+    server.inject({
+      method: 'GET',
+      url: '/',
+      headers: {
+        accept: 'text/html'
+      },
+    }, (response) => {
+      code.expect(response.result).to.equal('Hello');
       allDone();
     });
   });
