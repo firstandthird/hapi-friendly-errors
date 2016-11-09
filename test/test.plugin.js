@@ -23,6 +23,8 @@ lab.experiment('hapi-friendly-errors', () => {
         logErrors: true,
         view: 'error'
       }
+    }, (err) => {
+      code.expect(err).to.be.undefined();
     });
 
     server.register(Vision, (err) => {
@@ -68,6 +70,24 @@ lab.experiment('hapi-friendly-errors', () => {
         }
         done();
       });
+    });
+  });
+
+  lab.test(' should validate that a view option exists', (allDone) => {
+    const testServer =  new Hapi.Server({
+      debug: {
+        log: ['error']
+      }
+    });
+
+    testServer.register({
+      register: friendlyErrors,
+      options: {
+        logErrors: true
+      }
+    }, (err) => {
+      code.expect(err).to.be.an.error();
+      allDone();
     });
   });
 
