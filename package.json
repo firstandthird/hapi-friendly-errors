@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "lab --leaks",
+    "test-travis": "lab -r lcov | ./node_modules/.bin/coveralls",
     "lint": "eslint **/*.js"
   },
   "keywords": [
@@ -24,6 +25,7 @@
   "devDependencies": {
     "boom": "^4.2.0",
     "code": "^4.0.0",
+    "coveralls": "^2.11.8",
     "eslint": "^3.9.1",
     "eslint-config-firstandthird": "^3.0.2",
     "eslint-plugin-import": "^1.14.0",
