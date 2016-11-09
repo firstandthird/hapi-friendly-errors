@@ -1,3 +1,5 @@
+
+
 exports.register = function(server, options, next) {
 
   if (!options.view) {
@@ -31,11 +33,19 @@ exports.register = function(server, options, next) {
 
       var payload = response.output.payload;
 
-      return reply.view(options.view, {
+      var context = {
         statusCode: response.output.statusCode,
         error: payload.error,
         message: payload.message
-      }).code(response.output.statusCode);
+      };
+
+      if (options.context) {
+        for (var key in options.context) {
+          if (options.context.hasOwnProperty(key)) context[key] = options.context[key];
+        }
+      }
+
+      return reply.view(options.view, context).code(response.output.statusCode);
     }
 
     reply.continue();
