@@ -28,9 +28,9 @@
     "coveralls": "^2.11.8",
     "eslint": "^3.9.1",
     "eslint-config-firstandthird": "^3.0.2",
-    "eslint-plugin-import": "^1.14.0",
+    "eslint-plugin-import": "^2.2.0",
     "handlebars": "^4.0.5",
-    "hapi": "^15.2.0",
+    "hapi": "^16.0.2",
     "lab": "^11.1.0",
     "vision": "^4.1.0"
   }
