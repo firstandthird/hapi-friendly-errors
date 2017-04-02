@@ -2,8 +2,8 @@
 
 exports.register = function(server, options, next) {
 
-  if (!options.view) {
-    return next(new Error('must pass in view path'));
+  if (!options.view && !options.url) {
+    return next(new Error('must pass in view path or url'));
   }
 
   server.ext('onPreResponse', function(request, reply) {
@@ -29,6 +29,16 @@ exports.register = function(server, options, next) {
           payload: request.payload,
           stack: response.stack
         });
+      }
+      if (options.url) {
+        const { statusCode, error, message } = response.output.payload
+        server.inject({
+          url: `${options.url}?statusCode=${statusCode}&error=${error}&message=${message}`,
+          method: 'GET',
+        }, (res) => {
+          reply(null, res.payload).code(response.output.statusCode);
+        })
+        return;
       }
 
       var payload = response.output.payload;
