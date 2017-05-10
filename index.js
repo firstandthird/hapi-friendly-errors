@@ -23,7 +23,9 @@ exports.register = function(server, options, next) {
         });
       }
       if (options.url) {
-        const { statusCode, error, message } = response.output.payload;
+        const statusCode = response.output.payload.statusCode;
+        const error = response.output.payload.error;
+        const message = response.output.payload.message;
         server.inject({
           url: `${options.url}?statusCode=${statusCode}&error=${error}&message=${message}`,
           method: 'GET',
