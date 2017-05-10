@@ -51,7 +51,7 @@ exports.register = function(server, options, next) {
       }
       // a default error message:
       if (!options.view) {
-        return reply(`<h1>There was an error</h1><h2>${context.error}: ${context.message}}</h2>`).code(response.output.statusCode);
+        return reply(`<h1>There was an error</h1><h2>${context.error}: ${context.message}</h2>`).code(response.output.statusCode);
       }
       return reply.view(options.view, context).code(response.output.statusCode);
     }
