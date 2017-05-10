@@ -23,11 +23,8 @@ exports.register = function(server, options, next) {
         });
       }
       if (options.url) {
-        const statusCode = response.output.payload.statusCode;
-        const error = response.output.payload.error;
-        const message = response.output.payload.message;
         server.inject({
-          url: `${options.url}?statusCode=${statusCode}&error=${error}&message=${message}`,
+          url: `${options.url}?statusCode=${response.output.payload.statusCode}&error=${response.output.payload.error}&message=${response.output.payload.message}`,
           method: 'GET',
         }, (res) => {
           reply(null, res.payload).code(response.output.statusCode);
