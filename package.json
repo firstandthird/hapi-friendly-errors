@@ -22,6 +22,9 @@
     "url": "https://github.com/firstandthird/hapi-friendly-errors/issues"
   },
   "homepage": "https://github.com/firstandthird/hapi-friendly-errors#readme",
+  "eslintConfig": {
+    "extends": "firstandthird"
+  },
   "devDependencies": {
     "boom": "^4.2.0",
     "code": "^4.0.0",

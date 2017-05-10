@@ -64,28 +64,10 @@ lab.experiment('hapi-friendly-errors', () => {
         }
       });
 
-      server.start((err) => {
-        code.expect(err).to.be.undefined();
+      server.start((err2) => {
+        code.expect(err2).to.be.undefined();
         done();
       });
-    });
-  });
-
-  lab.test(' should validate that a view option exists', (allDone) => {
-    const testServer =  new Hapi.Server({
-      debug: {
-        log: ['error']
-      }
-    });
-
-    testServer.register({
-      register: friendlyErrors,
-      options: {
-        logErrors: true
-      }
-    }, (err) => {
-      code.expect(err).to.be.an.error();
-      allDone();
     });
   });
 
@@ -217,6 +199,80 @@ lab.experiment('url', () => {
         message: 'Not Authorized'
       });
       done();
+    });
+  });
+});
+
+lab.experiment('hapi-friendly-errors default page', () => {
+  let server;
+  lab.before((done) => {
+    server = new Hapi.Server({
+      debug: {
+        log: ['error']
+      }
+    });
+    server.connection({ port: 3001 });
+    server.register({
+      register: friendlyErrors,
+      options: {
+        logErrors: true
+      }
+    }, (err) => {
+      code.expect(err).to.be.undefined();
+    });
+    server.register(Vision, (err) => {
+      if (err) {
+        throw err;
+      }
+      server.views({
+        engines: { html: require('handlebars') },
+        path: `${__dirname}/tmpl`,
+        context: {
+          someData: 'VALUE'
+        }
+      });
+      server.route({
+        path: '/',
+        method: 'GET',
+        handler(request, reply) {
+          reply('Hello');
+        }
+      });
+      server.route({
+        path: '/not-found',
+        method: 'GET',
+        handler(request, reply) {
+          reply(Boom.notFound('not found here'));
+        }
+      });
+      server.route({
+        path: '/api-route',
+        method: 'GET',
+        handler(request, reply) {
+          reply(Boom.forbidden('Not Authorized', { user: false }));
+        }
+      });
+      server.start((err2) => {
+        code.expect(err2).to.be.undefined();
+        done();
+      });
+    });
+  });
+  lab.after((done) => {
+    server.stop(done);
+  });
+
+  lab.test(' should return a friendly error page if none was specified', (allDone) => {
+    server.inject({
+      method: 'GET',
+      url: '/not-found',
+      headers: {
+        accept: 'text/html'
+      }
+    }, (response) => {
+      code.expect(response.statusCode).to.equal(404);
+      code.expect(response.payload).to.startWith('<h1>There was an error</h1>');
+      allDone();
     });
   });
 });
