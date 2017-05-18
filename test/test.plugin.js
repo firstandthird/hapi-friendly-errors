@@ -276,3 +276,47 @@ lab.experiment('hapi-friendly-errors default page', () => {
     });
   });
 });
+
+lab.experiment('url - error on error page', () => {
+  let server;
+  lab.beforeEach((done) => {
+    server = new Hapi.Server({
+      debug: {
+        log: ['error']
+      }
+    });
+    server.connection({ port: 3001 });
+    server.register({
+      register: friendlyErrors,
+      options: {
+        logErrors: true,
+        url: '/error'
+      }
+    }, (err) => {
+      code.expect(err).to.be.undefined();
+    });
+
+    server.route({
+      path: '/error',
+      method: 'GET',
+      handler(request, reply) {
+        reply(new Error('oops'));
+      }
+    });
+
+    server.start((err) => {
+      code.expect(err).to.be.undefined();
+      done();
+    });
+  });
+  lab.afterEach((done) => {
+    server.stop(done);
+  });
+  lab.test('should serve up basic response if error url is erroring', (done) => {
+    server.inject('/not-found', (res) => {
+      code.expect(res.statusCode).to.equal(404);
+      code.expect(res.payload).to.equal('404 - Not Found');
+      done();
+    });
+  });
+});

@@ -23,12 +23,17 @@ exports.register = function(server, options, next) {
         });
       }
       if (options.url) {
+        if (request.path === options.url) {
+          //error page is erroring
+          return reply(`${request.query.statusCode} - ${request.query.error}`);
+        }
+        const { statusCode, error, message } = response.output.payload
         server.inject({
-          url: `${options.url}?statusCode=${response.output.payload.statusCode}&error=${response.output.payload.error}&message=${response.output.payload.message}`,
+          url: `${options.url}?statusCode=${statusCode}&error=${error}&message=${message}`,
           method: 'GET',
         }, (res) => {
           reply(null, res.payload).code(response.output.statusCode);
-        });
+        })
         return;
       }
 
