@@ -1,6 +1,6 @@
 'use strict';
 
-const register = async function(server, options) {
+const register = function(server, options) {
   server.ext('onPreResponse', async (request, h) => {
     const response = request.response;
     const path = request.path;
@@ -26,15 +26,23 @@ const register = async function(server, options) {
           //error page is erroring
           return `${request.query.statusCode} - ${request.query.error}`;
         }
-        const { statusCode, error, message } = response.output.payload
+        const { statusCode, error, message } = response.output.payload;
         const res = await server.inject({
           url: `${options.url}?statusCode=${statusCode}&error=${error}&message=${message}`,
           method: 'GET',
         });
 
-        return h
-        .response(res.payload)
-        .code(response.output.statusCode);
+        const resp = h
+          .response(res.payload)
+          .code(response.output.statusCode);
+
+        resp._error = {
+          stack: null,
+          data: response.data,
+          output: response.output
+        };
+
+        return resp;
       }
 
       const payload = response.output.payload;
@@ -55,13 +63,28 @@ const register = async function(server, options) {
       }
       // a default error message:
       if (!options.view) {
-        return h
-        .response(`<h1>There was an error</h1><h2>${context.error}: ${context.message}</h2>`)
-        .code(response.output.statusCode);
+        const resp = h
+          .response(`<h1>There was an error</h1><h2>${context.error}: ${context.message}</h2>`)
+          .code(response.output.statusCode);
+        resp._error = {
+          stack: null,
+          data: response.data,
+          output: response.output
+        };
+
+        return resp;
       }
-      return h
-      .view(options.view, context)
-      .code(response.output.statusCode);
+      const resp = h
+        .view(options.view, context)
+        .code(response.output.statusCode);
+
+      resp._error = {
+        stack: null,
+        data: response.data,
+        output: response.output
+      };
+
+      return resp;
     }
     return h.continue;
   });

@@ -26,12 +26,13 @@
     "extends": "firstandthird"
   },
   "devDependencies": {
+    "eclint": "^2.4.3",
+    "eslint": "^4.17.0",
+    "eslint-config-firstandthird": "^4.0.1",
+    "eslint-plugin-import": "^2.9.0",
     "boom": "^4.2.0",
     "code": "^5.1.2",
     "coveralls": "^2.11.8",
-    "eslint": "^3.9.1",
-    "eslint-config-firstandthird": "^3.0.2",
-    "eslint-plugin-import": "^2.2.0",
     "handlebars": "^4.0.5",
     "hapi": "^17.0.1",
     "lab": "^15.1.2",
