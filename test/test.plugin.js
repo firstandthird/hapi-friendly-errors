@@ -154,7 +154,12 @@ lab.experiment('url', () => {
     await server.stop();
   });
   lab.test('should serve up /error and pass in query from error', async () => {
-    const res = await server.inject('/not-found');
+    const res = await server.inject({
+      url: '/not-found',
+      headers: {
+        accept: 'text/html'
+      }
+    });
     code.expect(res.statusCode).to.equal(404);
     code.expect(JSON.parse(res.payload)).to.equal({
       statusCode: '404',
@@ -163,7 +168,12 @@ lab.experiment('url', () => {
     });
   });
   lab.test('should serve up /error and pass in query from error', async () => {
-    const res = await server.inject('/forbidden');
+    const res = await server.inject({
+      url: '/forbidden',
+      headers: {
+        accept: 'text/html'
+      }
+    });
     code.expect(res.statusCode).to.equal(403);
     code.expect(JSON.parse(res.payload)).to.equal({
       statusCode: '403',
@@ -256,7 +266,7 @@ lab.experiment('url - error on error page', () => {
       path: '/error',
       method: 'GET',
       handler(request, reply) {
-        throw new Error('oops');
+        throw Boom.notFound();
       }
     });
     await server.start();
@@ -265,7 +275,12 @@ lab.experiment('url - error on error page', () => {
     await server.stop();
   });
   lab.test('should serve up basic response if error url is erroring', async () => {
-    const res = await server.inject('/not-found');
+    const res = await server.inject({
+      url: '/not-found',
+      headers: {
+        accept: 'text/html'
+      }
+    });
     code.expect(res.statusCode).to.equal(404);
     code.expect(res.payload).to.equal('404 - Not Found');
   });
