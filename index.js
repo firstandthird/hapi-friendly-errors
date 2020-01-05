@@ -22,15 +22,24 @@ const register = function(server, options) {
         });
       }
       if (options.url) {
+        // always skip friendly errors if accept header didn't specify html:
+        if (!request.headers.accept || !request.headers.accept.match('html')) {
+          return h.continue;
+        }
         if (request.path === options.url) {
           //error page is erroring
           return `${request.query.statusCode} - ${request.query.error}`;
         }
         const { statusCode, error, message } = response.output.payload;
-        const res = await server.inject({
+        const call = {
           url: `${options.url}?statusCode=${statusCode}&error=${error}&message=${message}`,
           method: 'GET',
-        });
+        };
+        // must include accept header to get a friendly error:
+        if (request.headers.accept) {
+          call.headers = { accept: request.headers.accept };
+        }
+        const res = await server.inject(call);
 
         const resp = h
           .response(res.payload)
@@ -41,7 +50,6 @@ const register = function(server, options) {
           data: response.data,
           output: response.output
         };
-
         return resp;
       }
 
