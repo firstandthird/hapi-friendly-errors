@@ -1,4 +1,4 @@
-# Hapi FRIENDLY Errors
+# hapi-friendly-errors
 
 [![Coverage Status](https://coveralls.io/repos/github/firstandthird/hapi-friendly-errors/badge.svg)](https://coveralls.io/github/firstandthird/hapi-friendly-errors)
 
@@ -20,7 +20,7 @@ await server.register({
 });
 ```
 
-Say you have a broken route like this:
+If you have a broken route like this:
 ```js
 server.route({
   path: '/foobar',
@@ -31,7 +31,7 @@ server.route({
 });
 ```
 
-If you fetch the _/foobar_ route you will get back a 404 code with the following:
+when you fetch the _/foobar_ route, you will get back a 404 code with the following:
 
 ```html
 <h1>There was an error</h1>
@@ -91,11 +91,11 @@ hapi-friendly-errors will skip HTML and just return a JSON object when requests 
 
 - __errorBlacklist__
 
-  A regular expression passed as a string. Routes matching this regular expression will not have errors reports.
+  A regular expression passed as a string. Routes matching this regular expression will be ignored by hapi-friendly-errors
 
 - __logErrors__
 
-  When true will log output any time there is a 500 Server errors.
+  When true will log output any time there is a 500 Server error.
 
 - __url__
 
@@ -131,12 +131,12 @@ hapi-friendly-errors will skip HTML and just return a JSON object when requests 
   });
   ```
 
-Now when you call the _/foobar_ route you will get back:
-```HTML
-<h1>An Error Handled by Route</h1>
-<b>Error</b> 404 Not Found
-<b>Message</b> this is not foobar!
-```
+  Now when you call the _/foobar_ route you will get back:
+  ```HTML
+  <h1>An Error Handled by Route</h1>
+  <b>Error</b> 404 Not Found
+  <b>Message</b> this is not foobar!
+  ```
 
 - __context__
 
