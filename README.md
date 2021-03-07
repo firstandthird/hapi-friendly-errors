@@ -85,5 +85,85 @@ hapi-friendly-errors will skip HTML and just return a JSON object when requests 
 ```
 
 
+## Plugin Options
 
-## Options
+  You can pass these when you register the plugin
+
+- __errorBlacklist__
+
+  A regular expression passed as a string. Routes matching this regular expression will not have errors reports.
+
+- __logErrors__
+
+  When true will log output any time there is a 500 Server errors.
+
+- __url__
+
+  You can also specify a local URL to render and return HTML errors, when this happens the statusCode, error and message will be passed as query parameters:
+
+  ```js
+  await server.register({
+    plugin: require('hapi-friendly-errors'),
+    options: {
+      url: '/error'
+    }
+  });
+
+  server.route({
+    path: '/foobar',
+    method: 'GET',
+    handler(request, reply) {
+      throw Boom.notFound('this is not foobar');
+    }
+  });
+
+  server.route({
+    path: '/error',
+    method: 'GET',
+    handler(request, h) {
+      const query = request.query;
+      return `
+      <h1>An Error Handled by Route</h1>
+      <b>Error</b> ${query.statusCode} ${query.error.}
+      <b>Message</b> ${query.message}
+      `;
+    }
+  });
+  ```
+
+Now when you call the _/foobar_ route you will get back:
+```HTML
+<h1>An Error Handled by Route</h1>
+<b>Error</b> 404 Not Found
+<b>Message</b> this is not foobar!
+```
+
+- __context__
+
+  An object that will be merged with the context and passed to the rendering engine. If specified, _error_, _message_ and _statusCode_ will be overridden.
+  ```js
+  await server.register({
+    plugin: require('hapi-friendly-errors'),
+    options: {
+      context: {
+        data1: 'some more data',
+        error: 'A Server Error'
+      }
+    }
+  });
+  ```
+
+  Now errors will look something like:
+
+  ```html
+  <h1>There was an error</h1>
+  <h2>A Server Error: this is not foobar</h2>
+  ```
+
+- __view__
+
+  Name of the view to render, if not specified then view will default to:
+
+  ```js
+  `<h1>There was an error</h1><h2>${context.error}: ${context.message}</h2>`
+  ```
